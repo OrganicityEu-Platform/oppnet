@@ -1,4 +1,5 @@
-# OrganiCity - OppNet Application v0.2
+# Opportunistic Connectivity Service
+## OrganiCity - OppNet Application v0.2
 
 ## Introduction
 ###### OrganiCity
@@ -62,3 +63,10 @@ There are five main UI:
 3. Network UI: it shows the status of the network.
 4. Settings UI: it enables basic settings for the app.
 5. Experiment UI: it shows details for a certain experiment.
+
+see also
+ * https://organicityeu.github.io/oppnet/
+ * http://organicity.eu/tools/
+
+
+
