@@ -238,7 +238,6 @@
                 android:layout_weight="1"
                 android:textColor="#ef4070"
                 android:textSize="20sp"
-                android:enabled="false"
                 android:textStyle="bold" />
         </LinearLayout>
 

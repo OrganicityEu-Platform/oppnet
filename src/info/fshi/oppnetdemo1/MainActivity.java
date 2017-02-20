@@ -4,14 +4,14 @@ import info.fshi.oppnetdemo1.account.AccountManager;
 import info.fshi.oppnetdemo1.bluetooth.BTCom;
 import info.fshi.oppnetdemo1.bluetooth.BTController;
 import info.fshi.oppnetdemo1.bluetooth.BTScanningAlarm;
-import info.fshi.oppnetdemo1.data.DataManager;
 import info.fshi.oppnetdemo1.data.QueueManager;
+import info.fshi.oppnetdemo1.energy.BatteryMonitor;
 import info.fshi.oppnetdemo1.fragment.AccountFragment;
 import info.fshi.oppnetdemo1.fragment.ExperimentFragment;
 import info.fshi.oppnetdemo1.fragment.NetworkFragment;
 import info.fshi.oppnetdemo1.fragment.SettingsFragment;
-import info.fshi.oppnetdemo1.http.WebServerConnector;
 import info.fshi.oppnetdemo1.packet.BasicPacket;
+import info.fshi.oppnetdemo1.sensor.TemperatureSensorListener;
 import info.fshi.oppnetdemo1.utils.Constants;
 import info.fshi.oppnetdemo1.utils.Utils;
 
@@ -59,8 +59,6 @@ public class MainActivity extends Activity {
 	private final int REQUEST_BT_DISCOVERABLE = 11;
 	private int RESULT_BT_DISCOVERABLE_DURATION = 0;
 
-	WebServerConnector mWebConnector = null;
-
 	MyFragmentAdapter mFragmentPagerAdapter;
 	ViewPager mViewPager;
 
@@ -89,8 +87,7 @@ public class MainActivity extends Activity {
 			}
 		}
 
-		mWebConnector = new WebServerConnector(mContext);
-
+		TemperatureSensorListener.getInstance(mContext).start();
 		mFragmentPagerAdapter = new MyFragmentAdapter(getFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
@@ -148,8 +145,6 @@ public class MainActivity extends Activity {
 		super.onResume();
 		initBluetoothUtils();
 	}
-
-
 
 	@SuppressWarnings("deprecation")
 	private void setButtonDrawables(int position){
@@ -211,7 +206,7 @@ public class MainActivity extends Activity {
 			return null;
 		}
 	}
-	
+
 	private void registerBroadcastReceivers(){
 		// Register the bluetooth BroadcastReceiver
 		IntentFilter filter = new IntentFilter();
@@ -263,7 +258,9 @@ public class MainActivity extends Activity {
 		Log.d(TAG, "onDestroy()");
 		super.onDestroy();
 		BTScanningAlarm.stopScanning(mContext);
+		QueueManager.getInstance(mContext).stop(mContext);
 		unregisterBroadcastReceivers();
+		TemperatureSensorListener.getInstance(mContext).stop();
 	}
 
 	/**
@@ -279,7 +276,7 @@ public class MainActivity extends Activity {
 			Log.d(TAG, "# of relays " + String.valueOf(deviceRelay.size()));
 
 			QueueManager.getInstance(mContext).peers += deviceRelay.size();
-			
+
 			// send to sink if queue len > 1
 			boolean sendToSink = false;
 			boolean sendToSensor = false;
@@ -314,19 +311,21 @@ public class MainActivity extends Activity {
 
 			if(!sendToSensor){
 				indexToRemove = -1;
-				int minPeerQueueLen = QueueManager.getInstance(mContext).getQueueLength();
+				double maxScore = 0;
 				BluetoothDevice deviceToConnect = null;
 				for(BluetoothDevice device : deviceRelay){
-					int tmpPeerQueueLen = Integer.parseInt(device.getName());
-					if(tmpPeerQueueLen < minPeerQueueLen - 1){
+					int tmpPeerQueueLen = Utils.getQueueLen(device.getName());
+					int tmpEnergyLevel = Utils.getBatteryLevel(device.getName());
+					double score = (QueueManager.getInstance(mContext).getQueueLength() - tmpPeerQueueLen) + Constants.ENERGY_PENALTY_COEFF * (tmpEnergyLevel - BatteryMonitor.getInstance(mContext).getBatteryLevel());
+					if(score > maxScore){
 						indexToRemove = deviceRelay.indexOf(device);
 						deviceToConnect = device;
-						peerQueueLen = tmpPeerQueueLen;
-						Log.d(TAG, "smaller peer queue found " + String.valueOf(peerQueueLen));
+						Log.d(TAG, "smaller score found " + String.valueOf(tmpPeerQueueLen) + ":" + String.valueOf(Utils.getBatteryLevel(device.getName())));
+						maxScore = score;
 					}
 				}
 
-				if(indexToRemove >= 0){
+				if(indexToRemove >= 0 && QueueManager.getInstance(mContext).getQueueLength() > 0){
 					deviceRelay.remove(indexToRemove);
 					mBTController.connectBTServer(deviceToConnect, Constants.BT_CLIENT_TIMEOUT);
 					QueueManager.getInstance(mContext).contacts += 1;
@@ -335,8 +334,6 @@ public class MainActivity extends Activity {
 			return null;
 		}
 	}
-
-	private int peerQueueLen;
 
 	@SuppressLint("HandlerLeak") private class BTServiceHandler extends Handler {
 
@@ -355,67 +352,57 @@ public class MainActivity extends Activity {
 			protected Result doInBackground(String... strings) {
 				// init the counter
 				String MAC = strings[0];
+				String name = strings[1];
 				Result re = new Result();
 				re.MAC = MAC;
 				re.data = "";
-				Log.d(TAG, "peer queue len " + String.valueOf(peerQueueLen));
-				DataManager.getInstance(mContext).saveLog("peer queue len " + String.valueOf(peerQueueLen));
-				int queueDiff = (QueueManager.getInstance(mContext).getQueueLength() - peerQueueLen);
 
 				String[] packet = null;
-				if(queueDiff > 1){
-					Log.d(TAG, "diff is " + String.valueOf(queueDiff));
-					DataManager.getInstance(mContext).saveLog("diff is " + String.valueOf(queueDiff));
 
-					JSONObject dataPacket = new JSONObject();
-					try {
-						dataPacket.put(BasicPacket.PACKET_TYPE, BasicPacket.PACKET_TYPE_DATA);
-					} catch (JSONException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					JSONArray dataArray = new JSONArray();
-					for(int i=0; i<Math.floor(queueDiff/2); i++){
-						packet = QueueManager.getInstance(mContext).getFromQueue();
-						if(packet != null){
-							if(packet[0] != null){
-								JSONObject data = new JSONObject();
-								try {
-									data.put(BasicPacket.PACKET_PATH, packet[0]);
-									data.put(BasicPacket.PACKET_DATA, packet[1]);
-									data.put(BasicPacket.PACKET_ID, packet[2]);
-									data.put(BasicPacket.PACKET_DELAY, packet[3]);
-									dataArray.put(data);
-								} catch (JSONException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								peerQueueLen++;
-								re.data = re.data + packet[1];
-								re.length++;
+				JSONObject dataPacket = new JSONObject();
+				try {
+					dataPacket.put(BasicPacket.PACKET_TYPE, BasicPacket.PACKET_TYPE_DATA);
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				JSONArray dataArray = new JSONArray();
+				for(int i=0; i<Math.min(Constants.QUEUE_DIFF, QueueManager.getInstance(mContext).getQueueLength()); i++){
+					packet = QueueManager.getInstance(mContext).getFromQueue(Utils.getDeviceID(name));
+					if(packet != null){
+						if(packet[0] != null){
+							JSONObject data = new JSONObject();
+							try {
+								data.put(BasicPacket.PACKET_PATH, packet[0]);
+								data.put(BasicPacket.PACKET_DATA, packet[1]);
+								data.put(BasicPacket.PACKET_ID, packet[2]);
+								data.put(BasicPacket.PACKET_DELAY, packet[3]);
+								dataArray.put(data);
+							} catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
-							else{
-								mBTController.stopConnection(MAC);
-							}
+							re.data = re.data + packet[1];
+							re.length++;
 						}
 						else{
 							mBTController.stopConnection(MAC);
 						}
 					}
-					BluetoothAdapter.getDefaultAdapter().setName(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
-					Log.d(TAG, "update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
-					DataManager.getInstance(mContext).saveLog("update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
-
-					try {
-						dataPacket.put(BasicPacket.PACKET_DATA, dataArray);
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					else{
+						mBTController.stopConnection(MAC);
 					}
-					mBTController.sendToBTDevice(MAC, dataPacket);
-				}else{
-					mBTController.stopConnection(MAC);
 				}
+
+				try {
+					dataPacket.put(BasicPacket.PACKET_DATA, dataArray);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				mBTController.sendToBTDevice(MAC, dataPacket);
+
 				return re;
 			}
 
@@ -426,6 +413,7 @@ public class MainActivity extends Activity {
 					//					arrowView.setBackgroundResource(R.drawable.arrowright);
 					//					byteSent.setText(re.data.length() + " bytes");
 					//					txPeerQueueLen.setText(String.valueOf(peerQueueLen));
+					QueueManager.getInstance(mContext).updateName();
 				}
 			}
 		}
@@ -434,11 +422,12 @@ public class MainActivity extends Activity {
 		public void handleMessage(Message msg) {
 			Bundle b = msg.getData();
 			String MAC = b.getString(BTCom.BT_DEVICE_MAC);
+			String name = b.getString(BTCom.BT_DEVICE_NAME);
 			switch(msg.what){
 			case BTCom.BT_CLIENT_ALREADY_CONNECTED:
 			case BTCom.BT_CLIENT_CONNECTED:
 				// don't continue
-				new ClientConnectionTask().execute(MAC);
+				new ClientConnectionTask().execute(MAC, name);
 				break;
 			case BTCom.BT_CLIENT_CONNECT_FAILED:
 				Log.d(Constants.TAG_ACT_TEST, "client failed");
@@ -473,19 +462,15 @@ public class MainActivity extends Activity {
 							String delay = dataItem.getString(BasicPacket.PACKET_DELAY);
 
 							Log.d(TAG, "received packet " + id);
-							DataManager.getInstance(mContext).saveLog("received packet " + id);
-
+							
 							Log.d(TAG, "path : " + path.toString());
-							DataManager.getInstance(mContext).saveLog("path : " + path.toString());
 							receivedDataLen += data.length();
 							QueueManager.getInstance(mContext).packetsReceived ++;
 							QueueManager.getInstance(mContext).appendToQueue(id, path, data, delay);
 
 						}
 
-						BluetoothAdapter.getDefaultAdapter().setName(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
-						Log.d(TAG, "update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
-						DataManager.getInstance(mContext).saveLog("update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
+						QueueManager.getInstance(mContext).updateName();
 
 						//						txMyQueueLen.setText(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
 
@@ -495,9 +480,7 @@ public class MainActivity extends Activity {
 						//						byteSent.setText(String.valueOf(receivedDataLen) + " bytes");
 
 						Log.d(TAG, "receive " + receivedDataLen + " bytes data from " + MAC);
-						DataManager.getInstance(mContext).saveLog("receive " + receivedDataLen + " bytes data from " + MAC);
 						Log.d(TAG, "new queue size " + QueueManager.getInstance(mContext).getQueueLength());
-						DataManager.getInstance(mContext).saveLog("new queue size " + QueueManager.getInstance(mContext).getQueueLength());
 						JSONObject ack = new JSONObject();
 						try {
 							ack.put(BasicPacket.PACKET_TYPE, BasicPacket.PACKET_TYPE_DATA_ACK);
@@ -507,13 +490,10 @@ public class MainActivity extends Activity {
 						}
 						mBTController.sendToBTDevice(MAC, ack);
 						Log.d(TAG, "send ack to " + MAC);
-						DataManager.getInstance(mContext).saveLog("send ack to " + MAC);
-
 						break;
 					case BasicPacket.PACKET_TYPE_DATA_ACK:
 						Log.d(TAG, "receive ack");
-						DataManager.getInstance(mContext).saveLog("receive ack");
-
+						
 						mBTController.stopConnection(MAC);
 
 						QueueManager.getInstance(mContext).packetsSent ++;
@@ -557,10 +537,9 @@ public class MainActivity extends Activity {
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				String deviceMac = device.getAddress();
 				Log.d(TAG, "get a device : " + device.getName() + ", " + deviceMac);
-				DataManager.getInstance(mContext).saveLog("get a device : " + device.getName() + ", " + deviceMac);
-
+				
 				if(device.getName() != null){
-					if(Utils.isInteger(device.getName())){ // name parsing
+					if(Utils.isOppNetRelay(device.getName())){ // name parsing
 						if(!devicesFoundStringArray.contains(deviceMac)){
 							devicesFoundStringArray.add(deviceMac);
 							//deviceSensor.add(device);
@@ -575,8 +554,7 @@ public class MainActivity extends Activity {
 				if(System.currentTimeMillis() - scanStartTimestamp > Constants.SCAN_DURATION){
 					//a new scan has been started
 					Log.d(TAG, "Discovery process has been started: " + String.valueOf(System.currentTimeMillis()));
-					DataManager.getInstance(mContext).saveLog("Discovery process has been started: " + String.valueOf(System.currentTimeMillis()));
-
+					
 					devicesFoundStringArray = new ArrayList<String>();
 					deviceSink = new ArrayList<BluetoothDevice>();
 					deviceRelay = new ArrayList<BluetoothDevice>();
@@ -589,8 +567,7 @@ public class MainActivity extends Activity {
 				// Get the BluetoothDevice object from the Intent
 				if(System.currentTimeMillis() - scanStopTimestamp > Constants.SCAN_DURATION){
 					Log.d(TAG, "Discovery process has been stopped: " + String.valueOf(System.currentTimeMillis()));
-					DataManager.getInstance(mContext).saveLog("Discovery process has been stopped: " + String.valueOf(System.currentTimeMillis()));
-
+					
 					new ExchangeData().execute();
 					scanStopTimestamp = System.currentTimeMillis();
 				}

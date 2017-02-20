@@ -168,7 +168,7 @@
             android:layout_height="60dp"
             android:layout_weight="1"
             android:clickable="false"
-            android:contentDescription="@string/network_credit"
+            android:contentDescription="@string/network_peer"
             android:paddingLeft="15dp"
             android:scaleType="center"
             android:src="@drawable/peer_icon" />

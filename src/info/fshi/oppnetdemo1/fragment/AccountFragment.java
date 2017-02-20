@@ -56,8 +56,16 @@ public class AccountFragment extends Fragment {
 			});
 			break;
 		case AccountManager.STATE_AUTHORISED:
-			TextView accountInfo = (TextView) getView().findViewById(R.id.account_information);
-			accountInfo.setText(AccountManager.getManager().getToken());
+			TextView accountId = (TextView) getView().findViewById(R.id.account_id);
+			TextView accountExpired = (TextView) getView().findViewById(R.id.account_exp);
+			TextView accountUsername = (TextView) getView().findViewById(R.id.account_usrname);
+			TextView accountName = (TextView) getView().findViewById(R.id.account_name);
+			TextView accountEmail = (TextView) getView().findViewById(R.id.account_email);
+			accountId.setText(AccountManager.getManager().getParsedInfo().getSubject());
+			accountExpired.setText(AccountManager.getManager().getParsedInfo().getExpiration().toString());
+			accountUsername.setText(AccountManager.getManager().getParsedInfo().get("preferred_username").toString());
+			accountName.setText(AccountManager.getManager().getParsedInfo().get("name").toString());
+			accountEmail.setText(AccountManager.getManager().getParsedInfo().get("email").toString());
 			break;
 		case AccountManager.STATE_TOKEN_EXPIRED:
 			// renew token

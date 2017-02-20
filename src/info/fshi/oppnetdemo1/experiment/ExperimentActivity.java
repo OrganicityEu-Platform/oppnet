@@ -1,16 +1,14 @@
 package info.fshi.oppnetdemo1.experiment;
 
 import info.fshi.oppnetdemo1.R;
-import info.fshi.oppnetdemo1.data.QueueManager;
 import info.fshi.oppnetdemo1.utils.Constants;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -19,6 +17,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +37,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 public class ExperimentActivity extends FragmentActivity implements ConnectionCallbacks, OnConnectionFailedListener,
 LocationListener, OnMapReadyCallback {
@@ -56,7 +58,7 @@ LocationListener, OnMapReadyCallback {
 		setContentView(R.layout.activity_experiment);
 		mContext = this;
 		Intent intent = getIntent();
-		int index = intent.getIntExtra(Constants.INTENT_KEY_POSITION, -1);
+		final int index = intent.getIntExtra(Constants.INTENT_KEY_POSITION, -1);
 
 		exp = ExperimentList.experimentList.get(index);
 
@@ -66,27 +68,43 @@ LocationListener, OnMapReadyCallback {
 		TextView expDescTv = (TextView) findViewById(R.id.experiment_desc);
 		expDescTv.setText(exp.description);
 
-		TextView expLocTv = (TextView) findViewById(R.id.experiment_loc);
-		expLocTv.setText(exp.location);
-
 		TextView expTimeTv = (TextView) findViewById(R.id.experiment_time);
-		String date = new SimpleDateFormat("dd/MM/yyyy", Locale.UK).format(exp.endTime);
-		expTimeTv.setText(date);
-
-		TextView contactTv = (TextView) findViewById(R.id.network_contact);
-		contactTv.setText(String.valueOf(QueueManager.getInstance(mContext).contacts));
+		expTimeTv.setText(exp.endTime);
 		
-		TextView queueLenTv = (TextView) findViewById(R.id.network_queue_len);
-		queueLenTv.setText(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
+		Button buttonJoin = (Button) findViewById(R.id.btn_join);
+		buttonJoin.setOnClickListener(new OnClickListener(){
 
-		TextView receivedTv = (TextView) findViewById(R.id.network_received);
-		receivedTv.setText(String.valueOf(QueueManager.getInstance(mContext).packetsReceived));
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				for(Experiment exp : ExperimentList.experimentList){
+					exp.joined = 0;	
+				}
+				ExperimentList.experimentList.get(index).joined = 1;
+				ExperimentList.joinedExp = new Experiment(ExperimentList.experimentList.get(index));
+				Log.d(TAG, ExperimentList.joinedExp.id);
+				Toast.makeText(mContext, "Joined the experiment", Toast.LENGTH_LONG).show();
+//				WebServerConnector.getInstance(mContext).getAllExperiments();
+				ExperimentList.experimentListAdapter.notifyDataSetChanged();
+				ExperimentList.experimentListAdapter.sortList();
+				Constants.EXPERIMENT_ID = ExperimentList.joinedExp.id;
+			}
+		});
 
-		TextView sentTv = (TextView) findViewById(R.id.network_sent);
-		sentTv.setText(String.valueOf(QueueManager.getInstance(mContext).packetsSent));
-
-		TextView creditTv = (TextView) findViewById(R.id.network_credit);
-		creditTv.setText(String.valueOf(QueueManager.getInstance(mContext).packetsSent + QueueManager.getInstance(mContext).packetsReceived));	
+		//		TextView contactTv = (TextView) findViewById(R.id.network_contact);
+		//		contactTv.setText(String.valueOf(QueueManager.getInstance(mContext).contacts));
+		//
+		//		TextView queueLenTv = (TextView) findViewById(R.id.network_queue_len);
+		//		queueLenTv.setText(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
+		//
+		//		TextView receivedTv = (TextView) findViewById(R.id.network_received);
+		//		receivedTv.setText(String.valueOf(QueueManager.getInstance(mContext).packetsReceived));
+		//
+		//		TextView sentTv = (TextView) findViewById(R.id.network_sent);
+		//		sentTv.setText(String.valueOf(QueueManager.getInstance(mContext).packetsSent));
+		//
+		//		TextView creditTv = (TextView) findViewById(R.id.network_credit);
+		//		creditTv.setText(String.valueOf(QueueManager.getInstance(mContext).packetsSent + QueueManager.getInstance(mContext).packetsReceived));	
 
 		((SupportMapFragment)  getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
 
@@ -97,7 +115,6 @@ LocationListener, OnMapReadyCallback {
 			.addApi(LocationServices.API)
 			.build();
 		}
-
 	}
 
 	protected void onStart() {
@@ -111,26 +128,36 @@ LocationListener, OnMapReadyCallback {
 		}
 		super.onStop();
 	}
-	
+
 	Marker experimentMarker = null;
-	
+
 	@Override
 	public void onMapReady(GoogleMap map) {
 		// TODO Auto-generated method stub
 		mMap = map;
 		mMap.setMyLocationEnabled(true);
-		
-		LatLng loc = locationFromPostCode(exp.location);
-		
-		CameraUpdate experimentLoc = CameraUpdateFactory.newLatLngZoom(loc, 15);
-		map.animateCamera(experimentLoc);
-		
-		experimentMarker = mMap.addMarker(new MarkerOptions()
-		.position(loc)
-		.title(exp.name)
-		.snippet(exp.description));
-		experimentMarker.showInfoWindow();
 
+		if(exp.area.size() > 0){
+			double lat = 0;
+			double lng = 0;
+
+			PolygonOptions polygonOptions = new PolygonOptions();
+
+			for(LatLng latLng : exp.area){
+				polygonOptions.add(latLng);
+				lat += latLng.latitude;
+				lng += latLng.longitude;
+			}
+
+			lat /= exp.area.size();
+			lng /= exp.area.size();
+
+			polygonOptions.strokeColor(Color.RED).fillColor(Color.BLUE);
+			Polygon polygon = map.addPolygon(polygonOptions);
+
+			CameraUpdate experimentLoc = CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 8);
+			map.animateCamera(experimentLoc);
+		}
 	}
 
 	@Override
@@ -157,7 +184,6 @@ LocationListener, OnMapReadyCallback {
 		if (mLocationRequest != null) {
 			startLocationUpdates();
 		}
-
 	}
 
 	LocationRequest mLocationRequest = null;
@@ -180,7 +206,7 @@ LocationListener, OnMapReadyCallback {
 	public LatLng locationFromPostCode(String postCode){
 
 		LatLng loc = null;
-		
+
 		Geocoder geocoder1 = new Geocoder(this);
 		try {
 			List<Address> addresses1 = geocoder1.getFromLocationName(postCode, 1);

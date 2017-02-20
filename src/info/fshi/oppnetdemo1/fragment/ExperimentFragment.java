@@ -1,10 +1,10 @@
 package info.fshi.oppnetdemo1.fragment;
 
 import info.fshi.oppnetdemo1.R;
-import info.fshi.oppnetdemo1.experiment.Experiment;
 import info.fshi.oppnetdemo1.experiment.ExperimentActivity;
 import info.fshi.oppnetdemo1.experiment.ExperimentList;
 import info.fshi.oppnetdemo1.experiment.ExperimentListAdapter;
+import info.fshi.oppnetdemo1.http.WebServerConnector;
 import info.fshi.oppnetdemo1.utils.Constants;
 import android.app.Fragment;
 import android.content.Context;
@@ -41,25 +41,10 @@ public class ExperimentFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 		experimentLv = (ListView) getView().findViewById(R.id.experiment_list);
 		
-		ExperimentList.init();
-		
-		Experiment ex1 = new Experiment();
-		ex1.name = "IC OppNet";
-		ex1.description = "Imperial College OppNet Experiment";
-		ex1.location = "180 Queen's Gate, London SW7 2AZ";
-		ex1.endTime = System.currentTimeMillis() + 1000000000;
-		
-		Experiment ex2 = new Experiment();
-		ex2.name = "Olympic Park";
-		ex2.description = "Olympic Park OppNet Experiment with Intel and IC";
-		ex2.location = "London E20 2ST";
-		ex2.endTime = System.currentTimeMillis() + 200000000;
-
-		ExperimentList.experimentList.add(ex1);
-//		ExperimentList.experimentList.add(ex2);
-		
 		ExperimentList.experimentListAdapter = new ExperimentListAdapter(mContext, R.layout.experiment_listitem_layout);
 		// Assign adapter to ListView
+		WebServerConnector.getInstance(mContext).getAllExperiments();
+
 		experimentLv.setAdapter(ExperimentList.experimentListAdapter);
 
 		// ListView Item Click Listener

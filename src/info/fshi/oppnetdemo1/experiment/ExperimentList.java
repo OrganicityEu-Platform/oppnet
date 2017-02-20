@@ -8,9 +8,7 @@ public class ExperimentList {
 
 	public static ExperimentListAdapter experimentListAdapter;
 	
-	public static void init(){
-		experimentList = new ArrayList<Experiment>();
-	}
+	public static Experiment joinedExp = null;
 	
 	public static void update(ArrayList<Experiment> newExperimentList){
 		experimentList.clear(); 

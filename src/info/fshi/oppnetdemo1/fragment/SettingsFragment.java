@@ -2,7 +2,6 @@ package info.fshi.oppnetdemo1.fragment;
 
 import info.fshi.oppnetdemo1.R;
 import info.fshi.oppnetdemo1.utils.Constants;
-import info.fshi.oppnetdemo1.utils.SharedPreferencesUtil;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -93,9 +92,14 @@ public class SettingsFragment extends Fragment {
 		});
 
 		ToggleButton energyToggle = (ToggleButton) getView().findViewById(R.id.settings_energy_togglebutton);
+		energyToggle.setChecked(true);
 		energyToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
-				SharedPreferencesUtil.savePreferences(mContext, Constants.SP_KEY_ENERGY, isChecked);
+				if(isChecked){
+					Constants.ENERGY_PENALTY_COEFF = Constants.ENERGY_PENALTY_COEFF_ON;
+				}else{
+					Constants.ENERGY_PENALTY_COEFF = 0;
+				}
 			}
 		});
 

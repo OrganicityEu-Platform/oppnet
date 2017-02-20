@@ -66,10 +66,15 @@
             android:name=".experiment.ExperimentActivity"
             android:label="@string/experiment"
             android:screenOrientation="portrait" >
+            <category android:name="android.intent.category.DEFAULT" />
         </activity>
 
         <receiver
             android:name=".bluetooth.BTScanningAlarm"
+            android:enabled="true" >
+        </receiver>
+        <receiver
+            android:name=".data.QueueGenerationAlarm"
             android:enabled="true" >
         </receiver>
         <receiver

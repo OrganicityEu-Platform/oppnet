@@ -1,11 +1,11 @@
 package info.fshi.oppnetdemo1.experiment;
 
 import info.fshi.oppnetdemo1.R;
+import info.fshi.oppnetdemo1.R.color;
+import info.fshi.oppnetdemo1.R.string;
 
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,7 +35,7 @@ public class ExperimentListAdapter extends ArrayAdapter<Experiment> {
 		@Override
 		public int compare(Experiment lhs, Experiment rhs) {
 			// TODO Auto-generated method stub
-			return (int) (lhs.endTime - rhs.endTime);
+			return rhs.joined - lhs.joined;
 		}
 	}
 
@@ -43,7 +43,6 @@ public class ExperimentListAdapter extends ArrayAdapter<Experiment> {
 	public void sortList(){
 		Collections.sort(ExperimentList.experimentList, new ExperimentComparator());
 	}
-
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -58,7 +57,6 @@ public class ExperimentListAdapter extends ArrayAdapter<Experiment> {
 			holder = new ExperimentHolder();
 
 			holder.name = (TextView)row.findViewById(R.id.experiment_name);
-			holder.loc = (TextView)row.findViewById(R.id.experiment_loc);
 			holder.endTime = (TextView)row.findViewById(R.id.experiment_deadline);
 			holder.desc = (TextView)row.findViewById(R.id.experiment_desc);
 			row.setTag(holder);
@@ -71,12 +69,8 @@ public class ExperimentListAdapter extends ArrayAdapter<Experiment> {
 		Experiment experiment = ExperimentList.experimentList.get(position);
 		if(experiment != null){
 			holder.name.setText(experiment.name);
-
-			String date = new SimpleDateFormat("dd/MM/yyyy", Locale.UK).format(experiment.endTime);
-			
-			holder.endTime.setText(date);
+			holder.endTime.setText(experiment.endTime);
 			holder.desc.setText(experiment.description);
-			holder.loc.setText(experiment.location);
 		}
 
 		return row;
@@ -86,7 +80,6 @@ public class ExperimentListAdapter extends ArrayAdapter<Experiment> {
 	{
 		TextView name;
 		TextView desc;
-		TextView loc;
 		TextView endTime;
 	}
 

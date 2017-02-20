@@ -43,6 +43,7 @@ public class BTCom {
 	public final static int BT_SUCCESS = 10407;
 	public final static String BT_DATA_CONTENT = "bt_data"; // data received from another device
 	public final static String BT_DEVICE_MAC = "bt_device_mac"; // mac address of the communicating device
+	public final static String BT_DEVICE_NAME = "bt_device_name"; // name of the peer device
 
 	// default UUID	list
 	private static UUID MY_UUID = UUID.fromString("8113ac40-438f-11e1-b86c-0800200c9a60");
@@ -133,6 +134,7 @@ public class BTCom {
 		stopServer();
 		mServerThread = new ServerThread(MY_UUID);             
 		mServerThread.start();
+		Log.d(TAG, "server started");
 	}
 
 	/**
@@ -397,6 +399,7 @@ public class BTCom {
 		// send necessary info to the handler
 		Bundle b = new Bundle();
 		b.putString(BT_DEVICE_MAC, device.getAddress());
+		b.putString(BT_DEVICE_NAME, device.getName());
 		msg.setData(b);
 		try {
 			if(mMessenger != null)

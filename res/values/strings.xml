@@ -29,10 +29,18 @@
     <string name="settings_bluetooth_instruction">Turn on and off Bluetooth interface, if it is turned off, the application will not function properly and it will be shut down.</string>
     <string name="settings_wifi_instruction">Turn on and off WiFi interface, if it is turned off, the device will not be able to send data to the cloud, but it can still relay data if Bluetooth is enabled.</string>
     <string name="settings_battery_instruction">Turn on and off to enable battery savings operation, it will try to reduce certain operations to save battery power.</string>
-	<string name="settings_energy_awareness_instruction">Turn on and off to enable energy awareness operation, it will make routing decisions based on device\'s and peer\'s battery energy.(Function not yet avaiable)</string>
+	<string name="settings_energy_awareness_instruction">Turn on and off to enable energy awareness operation, it will make routing decisions based on device\'s and peer\'s battery energy.</string>
     <string name="experiment">Experiment</string>
     <string name="experiment_dashboard">Dashboard</string>
-	
+    <string name="experiment_join">Join</string>
+    <string name="account_username">Username</string>
+    <string name="account_name">Full name</string>
+    <string name="account_email">Email</string>
+    <string name="account_expiration">Expiration</string>
+    <string name="account_userid">User id</string>
+	<string name="account_userinfo">User Information</string>
+	<string name="account_tokeninfo">Token Information</string>
+    
     <color name="white">#FFFFFF</color>
     <color name="organicity">#EF4070</color>
     <color name="transparent">#00000000</color>

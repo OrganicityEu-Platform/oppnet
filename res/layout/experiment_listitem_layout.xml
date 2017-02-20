@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="5" >
+        android:weightSum="6" >
 
         <TextView
             android:id="@+id/experiment_name"
@@ -26,12 +26,11 @@
             android:id="@+id/experiment_deadline"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:gravity="right"
             android:padding="5dp"
             android:text="@string/app_name"
-            android:textSize="16sp"
-            android:textStyle="bold" >
+            android:textSize="12sp" >
         </TextView>
     </LinearLayout>
 
@@ -41,17 +40,9 @@
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:text="@string/app_name"
+        android:textColor="#989898"
         android:textSize="14sp" >
     </TextView>
 
-    <TextView
-        android:id="@+id/experiment_loc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="@string/app_name"
-        android:textColor="#989898"
-        android:textSize="12sp" >
-    </TextView>
 
 </LinearLayout>

@@ -7,5 +7,9 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="C:/Users/fshi/workspace/BackEndServer/libs/json.jar"/>
 	<classpathentry kind="lib" path="/MainActivity/libs/google-play-services.jar"/>
+	<classpathentry kind="lib" path="libs/jjwt-0.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/jackson-databind-2.6.2.jar"/>
+	<classpathentry kind="lib" path="libs/jackson-annotations-2.6.0.jar"/>
+	<classpathentry kind="lib" path="libs/jackson-core-2.6.2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
