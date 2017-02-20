@@ -11,13 +11,15 @@
 Opportunistic connectivity service is a tool in OrganiCity to enable co-creation of smart citizens. 
 The opportunistic network enabler uses smartphones and IoT devices to build a dynamic wireless communication "infrastructure" at an OC partner site. The software component that enables opportunistic communication will allow the smartphones of OC participants and IoT devices to become part of the networking infrastructure at OC partner sites.
 
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/integration.png" width="500">
+
 ## Application Architecture
 
 The application architecture is shown below:
 
-<img src="https://raw.githubusercontent.com/OrganiCity-OppNet/OppNet/master/oppnet.png" width="500">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/oppnet_architecture.png" width="500">
 
-The major components of the application include an account manager, a data manager, a device manager and a communication manager. Besides, an incentivisation scheme is also introduced here. 
+The major components of the application include an account manager, a data manager, a device manager and a communication manager. Besides, an incentivisation scheme is also introduced here.
 
 ###### Account manager
 
@@ -50,11 +52,11 @@ The app can be installed either through downloading the [.apk](https://github.co
 
 Screenshots of the application when running are shown here:
 
-<img src="https://raw.githubusercontent.com/OrganiCity-OppNet/OppNet/master/Screenshot_2016-07-08-15-14-06%5B1%5D.png" width="170">
-<img src="https://raw.githubusercontent.com/OrganiCity-OppNet/OppNet/master/Screenshot_2016-07-08-15-14-10%5B1%5D.png" width="170">
-<img src="https://raw.githubusercontent.com/OrganiCity-OppNet/OppNet/master/Screenshot_2016-07-08-15-14-14%5B1%5D.png" width="170">
-<img src="https://raw.githubusercontent.com/OrganiCity-OppNet/OppNet/master/Screenshot_2016-07-08-15-14-17%5B1%5D.png" width="170">
-<img src="https://raw.githubusercontent.com/OrganiCity-OppNet/OppNet/master/Screenshot_2016-07-08-15-14-24%5B1%5D.png" width="170">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-16-56.png " width="170">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-10.png " width="170">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-15.png " width="170">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-19.png " width="170">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-51.png " width="170">
 
 There are five main UI:
 
