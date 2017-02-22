@@ -167,5 +167,15 @@
             android:textSize="14sp" >
         </TextView>
     </LinearLayout>
+    
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/organicity"
+        android:text="@string/action_register"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
 </LinearLayout>

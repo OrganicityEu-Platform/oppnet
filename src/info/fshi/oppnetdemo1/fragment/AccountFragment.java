@@ -2,6 +2,7 @@ package info.fshi.oppnetdemo1.fragment;
 
 import info.fshi.oppnetdemo1.R;
 import info.fshi.oppnetdemo1.account.AccountManager;
+import info.fshi.oppnetdemo1.http.WebServerConnector;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -66,6 +67,16 @@ public class AccountFragment extends Fragment {
 			accountUsername.setText(AccountManager.getManager().getParsedInfo().get("preferred_username").toString());
 			accountName.setText(AccountManager.getManager().getParsedInfo().get("name").toString());
 			accountEmail.setText(AccountManager.getManager().getParsedInfo().get("email").toString());
+			
+			Button registerButton = (Button) getView().findViewById(R.id.btn_register);
+			registerButton.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					WebServerConnector.getInstance(mContext).registerDevice();
+				}
+			});
+			
 			break;
 		case AccountManager.STATE_TOKEN_EXPIRED:
 			// renew token

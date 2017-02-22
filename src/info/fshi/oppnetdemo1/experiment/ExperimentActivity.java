@@ -82,6 +82,7 @@ LocationListener, OnMapReadyCallback {
 				}
 				ExperimentList.experimentList.get(index).joined = 1;
 				ExperimentList.joinedExp = new Experiment(ExperimentList.experimentList.get(index));
+				Constants.EXPERIMENT_ID = ExperimentList.joinedExp.id;
 				Log.d(TAG, ExperimentList.joinedExp.id);
 				Toast.makeText(mContext, "Joined the experiment", Toast.LENGTH_LONG).show();
 //				WebServerConnector.getInstance(mContext).getAllExperiments();

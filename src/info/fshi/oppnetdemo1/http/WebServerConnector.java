@@ -1,8 +1,10 @@
 package info.fshi.oppnetdemo1.http;
 
+import info.fshi.oppnetdemo1.account.AccountManager;
 import info.fshi.oppnetdemo1.data.QueueManager;
 import info.fshi.oppnetdemo1.experiment.Experiment;
 import info.fshi.oppnetdemo1.experiment.ExperimentList;
+import info.fshi.oppnetdemo1.utils.Constants;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -14,6 +16,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,10 +36,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class WebServerConnector extends BroadcastReceiver{
 
-	private final String ENTITY_URI = "urn:oc:entity:london:oppnet:";
+	private final String ENTITY_URI = "urn:oc:entity:experimenters:";
 
 	private final static String TAG = "web server connector";
-	private static String serverUrl = "http://129.31.190.98:10226/v1/contextEntities/";
+	private final static String serverUrl = "https://exp.orion.organicity.eu/v2/entities";
 
 	private final static String EXPERIMENT_URL = "http://experimenters.organicity.eu:8081/";
 	
@@ -48,7 +52,6 @@ public class WebServerConnector extends BroadcastReceiver{
 	private WebServerConnector(Context context){
 		mContext = context;
 		updatedTime = System.currentTimeMillis();
-		//new RegisterDeviceTask().execute();
 	}
 	
 	public static WebServerConnector getInstance(Context context){
@@ -61,7 +64,7 @@ public class WebServerConnector extends BroadcastReceiver{
 	public WebServerConnector(){}
 
 	public void registerDevice(){
-
+		new RegisterDeviceTask().execute();
 	}
 	
 	public void getAllExperiments(){
@@ -153,7 +156,7 @@ public class WebServerConnector extends BroadcastReceiver{
 	private class SendSensorDataTask extends AsyncTask<String, Void, Void> {
 		protected Void doInBackground(String... data) {
 
-			String entityId = ENTITY_URI + "data:" + data[2];
+			String entityId = ENTITY_URI + AccountManager.getManager().getParsedInfo().getSubject() + ":" + Constants.EXPERIMENT_ID + ":" + "data:" + data[2];
 
 			Log.d(TAG, "send data to server");
 			
@@ -186,14 +189,17 @@ public class WebServerConnector extends BroadcastReceiver{
 			}
 
 			URL url;
-			HttpURLConnection connection = null;
+			HttpsURLConnection connection = null;
 			try{
 				Log.d(TAG, serverUrl + entityId);
 				
-				url = new URL(serverUrl + entityId);
-				connection = (HttpURLConnection)url.openConnection();
+				url = new URL(serverUrl);
+				connection = (HttpsURLConnection)url.openConnection();
 				connection.setRequestProperty("Content-Type", "application/json");
 				connection.setRequestProperty("Accept", "application/json");
+				connection.setRequestProperty("X-Organicity-Application", Constants.APPLICATION_ID);
+				connection.setRequestProperty("X-Organicity-Experiment", Constants.EXPERIMENT_ID);
+				connection.setRequestProperty("Authorization", String.format("Bearer %s", AccountManager.getManager().getToken()));
 				connection.setRequestMethod("POST");
 				connection.setDoInput(true);
 				connection.connect();
@@ -228,29 +234,34 @@ public class WebServerConnector extends BroadcastReceiver{
 		protected Void doInBackground(Void... params) {
 			// check if exists
 
-			String entityId = ENTITY_URI + "resource:" + Secure.getString(mContext.getContentResolver(),
+			String entityId = ENTITY_URI + AccountManager.getManager().getParsedInfo().getSubject() + ":" + Constants.EXPERIMENT_ID + ":" + Secure.getString(mContext.getContentResolver(),
 					Secure.ANDROID_ID); // unique identifier of the device
-
+			
+			Log.d(TAG, entityId);
+			
 			URL url;
-			HttpURLConnection connection = null;
+			HttpsURLConnection connection = null;
 			// register to orion
-
+			
 			JSONObject content = new JSONObject();
 			try {
-				content.put("type", "phone");
+				content.put("id", entityId);
+				content.put("type", "urn:oc:entityTypesmartPhone");
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			
+			Log.d(TAG, String.format("Bearer %s", AccountManager.getManager().getToken()));
+			
 			try{
-				Log.d(TAG, serverUrl + entityId);
-//				DataManager.getInstance(mContext).saveLog(serverUrl + entityId);
-				
-				url = new URL(serverUrl + entityId);
-				connection = (HttpURLConnection)url.openConnection();
+				url = new URL(serverUrl);
+				connection = (HttpsURLConnection)url.openConnection();
 				connection.setRequestProperty("Content-Type", "application/json");
 				connection.setRequestProperty("Accept", "application/json");
+				connection.setRequestProperty("X-Organicity-Application", Constants.APPLICATION_ID);
+				connection.setRequestProperty("X-Organicity-Experiment", Constants.EXPERIMENT_ID);
+				connection.setRequestProperty("Authorization", String.format("Bearer %s", AccountManager.getManager().getToken()));
 				connection.setRequestMethod("POST");
 				connection.setDoInput(true);
 				connection.connect();
@@ -259,6 +270,9 @@ public class WebServerConnector extends BroadcastReceiver{
 				out.write(content.toString().getBytes());
 				out.close();
 
+				Log.d(TAG, String.valueOf(connection.getResponseCode()));
+				Log.d(TAG, connection.getCipherSuite());
+				
 				InputStream in = new BufferedInputStream(connection.getInputStream());
 				BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8")); 
 				StringBuilder responseStrBuilder = new StringBuilder();
@@ -266,7 +280,7 @@ public class WebServerConnector extends BroadcastReceiver{
 				String inputStr;
 				while ((inputStr = streamReader.readLine()) != null)
 					responseStrBuilder.append(inputStr);
-//				Log.d(TAG, responseStrBuilder.toString());
+				Log.d(TAG, responseStrBuilder.toString());
 
 			} catch (IOException e) {
 				// writing exception to log
