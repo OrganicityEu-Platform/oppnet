@@ -46,6 +46,17 @@ The incentivisation algorithm is designed based on the selfish mule protocol int
 
 ## User Manuel
 
+####
+
+There are two possible ways to use OppNet to perform experiments on OrganiCity platform:
+
+- OppNet legacy: default OppNet application developed for sensor data relaying
+- Customized OppNet application: experimenters develop their own application using the framework OppNet provides
+
+#### OppNet legacy
+
+#### Customized application
+
 ###### Install the app
 
 The app can be installed either through downloading the [.apk](https://github.com/OrganiCity-OppNet/OppNet/releases/download/0.2/OppNet.apk) or compiling on your local machine. 
