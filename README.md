@@ -55,9 +55,11 @@ There are two possible ways to use OppNet to perform experiments on OrganiCity p
 
 #### OppNet legacy
 
+More to come... info for users
+
 #### Customized application
 
-More to come... info for the developers
+More to come... info for developers
 
 ###### Install the app
 
