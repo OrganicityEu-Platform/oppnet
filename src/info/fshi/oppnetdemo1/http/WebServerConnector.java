@@ -179,6 +179,7 @@ public class WebServerConnector extends BroadcastReceiver{
 				// experiment id
 				// application id
 				// user id
+				content.put("id", entityId);
 				content.put("type", "urn:oc:entityType:sensorData");
 				JSONArray attrs = new JSONArray();
 				JSONObject attr = new JSONObject();
@@ -198,7 +199,6 @@ public class WebServerConnector extends BroadcastReceiver{
 				attrs.put(attr);
 				content.put("attributes", attrs);
 				// data
-				content.put("id", entityId);
 				JSONObject timeInstant = new JSONObject();
 				timeInstant.put("type", "urn:oc:attributeType:ISO8601");
 				TimeZone tz = TimeZone.getTimeZone("UTC");
@@ -233,6 +233,10 @@ public class WebServerConnector extends BroadcastReceiver{
 				out.write(content.toString().getBytes());
 				out.close();
 
+				Log.d(TAG, String.valueOf(connection.getResponseCode()));
+				Log.d(TAG, connection.getResponseMessage());
+				Log.d(TAG, connection.getCipherSuite());
+				
 				InputStream in = new BufferedInputStream(connection.getInputStream());
 				BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8")); 
 				StringBuilder responseStrBuilder = new StringBuilder();
@@ -346,18 +350,22 @@ public class WebServerConnector extends BroadcastReceiver{
 
 			if(mContext != null){
 				if(currentTime - updatedTime > 1000*60*1){
-					while(QueueManager.getInstance(mContext).getQueueLength() > 0 & serverAvailable){
-						String[] data = QueueManager.getInstance(mContext).getFromQueue();
-						new SendSensorDataTask().execute(data);
-					}
-					QueueManager.getInstance(mContext).updateName();
-					Log.d(TAG, "update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
-					new GetAllExperimentsTask().execute();
-//					MainActivity.txMyQueueLen.setText(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
-					updatedTime = currentTime;
+					uploadSensorData(currentTime);
 				}
 			}
 		}
+	}
+	
+	public void uploadSensorData(long currentTime){
+		while(QueueManager.getInstance(mContext).getQueueLength() > 0 & serverAvailable){
+			String[] data = QueueManager.getInstance(mContext).getFromQueue();
+			new SendSensorDataTask().execute(data);
+		}
+		QueueManager.getInstance(mContext).updateName();
+		Log.d(TAG, "update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
+		new GetAllExperimentsTask().execute();
+//		MainActivity.txMyQueueLen.setText(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
+		updatedTime = currentTime;
 	}
 	
 	private SSLContext trainCA(){

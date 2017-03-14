@@ -2,7 +2,6 @@ package info.fshi.oppnetdemo1.data;
 
 import info.fshi.oppnetdemo1.energy.BatteryMonitor;
 import info.fshi.oppnetdemo1.sensor.TemperatureSensorListener;
-import info.fshi.oppnetdemo1.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.Random;
