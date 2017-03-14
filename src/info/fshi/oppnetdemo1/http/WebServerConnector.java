@@ -15,9 +15,23 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -165,7 +179,7 @@ public class WebServerConnector extends BroadcastReceiver{
 				// experiment id
 				// application id
 				// user id
-				content.put("type", "data");
+				content.put("type", "urn:oc:entityType:sensorData");
 				JSONArray attrs = new JSONArray();
 				JSONObject attr = new JSONObject();
 				attr.put("name", "light");
@@ -183,6 +197,16 @@ public class WebServerConnector extends BroadcastReceiver{
 				attr.put("value", data[3]);
 				attrs.put(attr);
 				content.put("attributes", attrs);
+				// data
+				content.put("id", entityId);
+				JSONObject timeInstant = new JSONObject();
+				timeInstant.put("type", "urn:oc:attributeType:ISO8601");
+				TimeZone tz = TimeZone.getTimeZone("UTC");
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+				df.setTimeZone(tz);
+				String nowAsISO = df.format(new Date());
+				timeInstant.put("value", nowAsISO);
+				content.put("TimeInstant", timeInstant);
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -195,6 +219,7 @@ public class WebServerConnector extends BroadcastReceiver{
 				
 				url = new URL(serverUrl);
 				connection = (HttpsURLConnection)url.openConnection();
+				connection.setSSLSocketFactory(trainCA().getSocketFactory());
 				connection.setRequestProperty("Content-Type", "application/json");
 				connection.setRequestProperty("Accept", "application/json");
 				connection.setRequestProperty("X-Organicity-Application", Constants.APPLICATION_ID);
@@ -246,7 +271,15 @@ public class WebServerConnector extends BroadcastReceiver{
 			JSONObject content = new JSONObject();
 			try {
 				content.put("id", entityId);
-				content.put("type", "urn:oc:entityTypesmartPhone");
+				content.put("type", "urn:oc:entityType:smartPhone");
+				JSONObject timeInstant = new JSONObject();
+				timeInstant.put("type", "urn:oc:attributeType:ISO8601");
+				TimeZone tz = TimeZone.getTimeZone("UTC");
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+				df.setTimeZone(tz);
+				String nowAsISO = df.format(new Date());
+				timeInstant.put("value", nowAsISO);
+				content.put("TimeInstant", timeInstant);
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -257,6 +290,7 @@ public class WebServerConnector extends BroadcastReceiver{
 			try{
 				url = new URL(serverUrl);
 				connection = (HttpsURLConnection)url.openConnection();
+				connection.setSSLSocketFactory(trainCA().getSocketFactory());
 				connection.setRequestProperty("Content-Type", "application/json");
 				connection.setRequestProperty("Accept", "application/json");
 				connection.setRequestProperty("X-Organicity-Application", Constants.APPLICATION_ID);
@@ -271,6 +305,7 @@ public class WebServerConnector extends BroadcastReceiver{
 				out.close();
 
 				Log.d(TAG, String.valueOf(connection.getResponseCode()));
+				Log.d(TAG, connection.getResponseMessage());
 				Log.d(TAG, connection.getCipherSuite());
 				
 				InputStream in = new BufferedInputStream(connection.getInputStream());
@@ -323,5 +358,73 @@ public class WebServerConnector extends BroadcastReceiver{
 				}
 			}
 		}
+	}
+	
+	private SSLContext trainCA(){
+		// Load CAs from an InputStream
+		// (could be from a resource or ByteArrayInputStream or ...)
+		CertificateFactory cf = null;
+		try {
+			cf = CertificateFactory.getInstance("X.509");
+		} catch (CertificateException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		InputStream caInput = Thread.currentThread().getContextClassLoader().getResourceAsStream("isrgrootx1.pem");
+
+		if(caInput == null)
+			caInput = this.getClass().getResourceAsStream("lets-encrypt-x3-cross-signed.pem");
+		Certificate ca = null;
+		try {
+		    ca = cf.generateCertificate(caInput);
+		    Log.d("test", "ca=" + ((X509Certificate) ca).getSubjectDN());
+		} catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+		    try {
+				caInput.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		// Create a KeyStore containing our trusted CAs
+		String keyStoreType = KeyStore.getDefaultType();
+		KeyStore keyStore;
+		SSLContext context = null;
+		try {
+			keyStore = KeyStore.getInstance(keyStoreType);
+			keyStore.load(null, null);
+			keyStore.setCertificateEntry("ca", ca);
+
+			// Create a TrustManager that trusts the CAs in our KeyStore
+			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+			tmf.init(keyStore);
+
+			// Create an SSLContext that uses our TrustManager
+			context = SSLContext.getInstance("TLS");
+			context.init(null, tmf.getTrustManagers(), null);
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return context;
 	}
 }
