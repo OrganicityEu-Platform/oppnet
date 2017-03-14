@@ -44,9 +44,9 @@ Experiment manager manages the interaction between oppnet and OC experiment plat
 ###### Incentivisation
 The incentivisation algorithm is designed based on the selfish mule protocol introduced in this [paper](https://www.google.co.uk/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0ahUKEwix3qCktMbNAhXFDsAKHWeXCUYQFggfMAA&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D6517116&usg=AFQjCNGuwb4q2gVJcBC2ildR4pA_usTD1A&sig2=SUX10aK4Z4zcO1hJ1_3rzA), which is based on a Backpressure routing protocol. Incentivisation is calculated locally and then relevant data will be transmitted to context broker during the experiment. 
 
-## User Manuel
+## User Guide
 
-####
+#### Overview
 
 There are two possible ways to use OppNet to perform experiments on OrganiCity platform:
 
@@ -56,6 +56,8 @@ There are two possible ways to use OppNet to perform experiments on OrganiCity p
 #### OppNet legacy
 
 #### Customized application
+
+More to come... info for the developers
 
 ###### Install the app
 
