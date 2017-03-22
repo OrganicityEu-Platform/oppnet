@@ -100,18 +100,6 @@ The application can be developed using any Android IDE, such as Eclipse and Andr
 
 The app can be installed either through downloading the [.apk](https://github.com/OrganiCity-OppNet/OppNet/releases/download/0.2/OppNet.apk) or compiling on your local machine. 
 
-Screenshots of the application when running are shown here:
-
-Solarized dark             |  Solarized Ocean
-:-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-16-56.png)  |  ![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-10.png)
-
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-16-56.png " width="150">
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-10.png " width="150">
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-15.png " width="150">
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-19.png " width="150">
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-51.png " width="150">
-
 There are five main UI:
 
 1. Experiment list UI: it shows the list of all available experiments.
@@ -119,6 +107,12 @@ There are five main UI:
 3. Network UI: it shows the status of the network.
 4. Settings UI: it enables basic settings for the app.
 5. Experiment UI: it shows details for a certain experiment.
+
+Screenshots of the application when running are shown here:
+
+Experiment list | Experiment | Account | Network | Settings
+:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-51.png)  |![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-19.png)  |![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-15.png)  | ![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-16-56.png)  |  ![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-10.png)
 
 see also
  * https://organicityeu.github.io/oppnet/
