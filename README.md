@@ -59,7 +59,16 @@ More to come... info for users
 
 #### Customized application
 
-More to come... info for developers
+The application can be developed using any Android IDE, such as Eclipse and Android Studio. There are several dependencies one need to add when compiling the provided code:
+
+- Google play services: one need to add google play services to the application in order to use the Google Map API for Android. More information can be found at https://developers.google.com/maps/documentation/android-api/start
+- jackson-annotations-X.X.X.jar: this is needed for account API
+- jackson-core-X.X.X.jar: for accounts
+- jackson-databind-X.X.X.jar: for accounts
+- jjwt-X.X.X.jar: to parse information from assigned token
+- json.jar: create or parse json message
+
+
 
 ###### Install the app
 

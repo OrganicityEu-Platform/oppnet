@@ -170,7 +170,7 @@ public class WebServerConnector extends BroadcastReceiver{
 	private class SendSensorDataTask extends AsyncTask<String, Void, Void> {
 		protected Void doInBackground(String... data) {
 
-			String entityId = ENTITY_URI + AccountManager.getManager().getParsedInfo().getSubject() + ":" + Constants.EXPERIMENT_ID + ":" + "data:" + data[2];
+			String entityId = ENTITY_URI + Constants.EXPERIMENTER_ID + ":" + Constants.EXPERIMENT_ID + ":" + AccountManager.getManager().getParsedInfo().getSubject() + ":" + data[2];
 
 			Log.d(TAG, "send data to server");
 			
@@ -180,24 +180,18 @@ public class WebServerConnector extends BroadcastReceiver{
 				// application id
 				// user id
 				content.put("id", entityId);
-				content.put("type", "urn:oc:entityType:sensorData");
-				JSONArray attrs = new JSONArray();
-				JSONObject attr = new JSONObject();
-				attr.put("name", "light");
-				attr.put("type", "string");
-				attr.put("value", data[1]);
-				attrs.put(attr);
-				attr = new JSONObject();
-				attr.put("name", "path");
-				attr.put("type", "string");
-				attr.put("value", data[0]);
-				attrs.put(attr);
-				attr = new JSONObject();
-				attr.put("name", "delay");
-				attr.put("type", "string");
-				attr.put("value", data[3]);
-				attrs.put(attr);
-				content.put("attributes", attrs);
+				content.put("type", "urn:oc:entityType:OppNetData");
+				JSONObject dataAttr = new JSONObject();
+				dataAttr.put("type", "urn:oc:attributeType:illuminance");
+				dataAttr.put("value", data[1]);
+				content.put("illuminance", dataAttr);
+				JSONObject pathAttr = new JSONObject();
+				pathAttr.put("type", "urn:oc:attributeType:description");
+				pathAttr.put("value", data[0]);
+				content.put("description", pathAttr);
+				JSONObject delayAttr = new JSONObject();
+				delayAttr.put("value", data[3]);
+				content.put("duration", delayAttr);
 				// data
 				JSONObject timeInstant = new JSONObject();
 				timeInstant.put("type", "urn:oc:attributeType:ISO8601");
@@ -263,7 +257,7 @@ public class WebServerConnector extends BroadcastReceiver{
 		protected Void doInBackground(Void... params) {
 			// check if exists
 
-			String entityId = ENTITY_URI + AccountManager.getManager().getParsedInfo().getSubject() + ":" + Constants.EXPERIMENT_ID + ":" + Secure.getString(mContext.getContentResolver(),
+			String entityId = ENTITY_URI + Constants.EXPERIMENTER_ID + ":" + Constants.EXPERIMENT_ID + ":" + AccountManager.getManager().getParsedInfo().getSubject() + ":" + Secure.getString(mContext.getContentResolver(),
 					Secure.ANDROID_ID); // unique identifier of the device
 			
 			Log.d(TAG, entityId);

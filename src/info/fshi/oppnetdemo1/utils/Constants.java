@@ -31,7 +31,7 @@ public abstract class Constants {
 	public static String INTENT_KEY_POSITION = "intent_key_position";
 	
 	// configure one's experiment id and application id
-	public static String EXPERIMENT_ID = "58a19f2ac2f43c7c37d174cd";
-	public static String APPLICATION_ID = "58aaf7a7a1f9185768a0d1b6";
-	public static String USER_ID = null;
+	public static String EXPERIMENT_ID = "58beba76d0010cb62fa01679";//"58a19f2ac2f43c7c37d174cd";
+	public static String APPLICATION_ID = "58cfc1580922ba0a1a7d4546";//"58aaf7a7a1f9185768a0d1b6";
+	public static String EXPERIMENTER_ID = "86d7edce-5092-44c0-bed8-da4beaa3fbc6";//"f3e1db7b-5f08-4cee-b715-939123fec017";
 }
