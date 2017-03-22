@@ -61,10 +61,14 @@ Following things must be done at the sensor side in order to achieve this:
 
 - The Bluetooth adapter name must be the following format: OppNet:[device type]:[device ID]:[queue size]:[battery level], for a sensor, it should be OppNet:S. Then the OppNet application will know that it is a sensor and thus tries to connect to it.
 - The packet sent to the OppNet application must be in the following format: 
-```json
+```javascript
 {"type": 102, "data": []}
 ```
-inside the array defined by field "data", each element is formatted as: {"path": a unique device id, "data": data content, "delay": 0, "id": data packet id}, then the application is able to correctly parse the packet the sensor sends to it.
+inside the array defined by field "data", each element is formatted as: 
+```json
+{"path": a unique device id, "data": data content, "delay": 0, "id": data packet id}
+```
+, then the application is able to correctly parse the packet the sensor sends to it.
 
 
 #### Customized application
