@@ -59,21 +59,29 @@ The OppNet legacy application is intended to be used only for sensor data relayi
 
 Following things must be done at the sensor side in order to achieve this:
 
-- The Bluetooth adapter name must be the following format: OppNet:[device type]:[device ID]:[queue size]:[battery level], for a sensor, it should be OppNet:S. Then the OppNet application will know that it is a sensor and thus tries to connect to it.
-- The packet sent to the OppNet application must be in the following format: 
+##### Bluetooth adapter name
+The Bluetooth adapter name must be the following format: 
+```javascript
+OppNet:[device type]:[device ID]:[queue size]:[battery level]
+```
+For a sensor, it should be OppNet:S. Then the OppNet application will know that it is a sensor and thus tries to connect to it.
+##### Bluetooth packet format
+The packet sent to the OppNet application must be in the following format: 
 ```javascript
 {
-	"type": 102, 
+	"type": 102,
 	"data": [
+		{
+			"path": unique_device_id, 
+			"data": data_content, 
+			"delay": 0, 
+			"id": data_packet_id
+		},
+		...
 	]
 }
 ```
-inside the array defined by field "data", each element is formatted as: 
-```json
-{"path": unique_device_id, "data": data_content, "delay": 0, "id": data_packet_id}
-```
 , then the application is able to correctly parse the packet the sensor sends to it.
-
 
 #### Customized application
 
