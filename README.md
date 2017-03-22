@@ -102,6 +102,10 @@ The app can be installed either through downloading the [.apk](https://github.co
 
 Screenshots of the application when running are shown here:
 
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-16-56.png)  |  ![](https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-10.png)
+
 <img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-16-56.png " width="150">
 <img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-10.png " width="150">
 <img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-15.png " width="150">
