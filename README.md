@@ -102,11 +102,11 @@ The app can be installed either through downloading the [.apk](https://github.co
 
 Screenshots of the application when running are shown here:
 
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-16-56.png " width="170">
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-10.png " width="170">
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-15.png " width="170">
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-19.png " width="170">
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-51.png " width="170">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-16-56.png " width="150">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-10.png " width="150">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-15.png " width="150">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-19.png " width="150">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/Screenshot_2017-02-20-12-17-51.png " width="150">
 
 There are five main UI:
 
