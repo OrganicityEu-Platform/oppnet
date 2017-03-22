@@ -57,7 +57,9 @@ There are two possible ways to use OppNet to perform experiments on OrganiCity p
 
 The OppNet legacy application is intended to be used only for sensor data relaying purpose. In order to use the application, one must provide correctly formatted data from their sensors in order for OppNet to talk to their sensors.
 
-More to come... info for users
+Following things must be done at the sensor side in order to achieve this:
+
+- The Bluetooth adapter name must be the following format: OppNet:[device type]:[device ID]:[queue size]:[battery level], for a sensor, it should be OppNet:S. Then the OppNet application will know that it is a sensor and thus tries to connect to it.
 
 #### Customized application
 
