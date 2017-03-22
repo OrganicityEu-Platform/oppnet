@@ -81,7 +81,7 @@ The packet sent to the OppNet application must be in the following format:
 	]
 }
 ```
-, then the application is able to correctly parse the packet the sensor sends to it.
+Then the application is able to correctly parse the packet the sensor sends to it.
 
 #### Customized application
 
