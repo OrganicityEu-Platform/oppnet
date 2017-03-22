@@ -63,7 +63,7 @@ Following things must be done at the sensor side in order to achieve this:
 - The packet sent to the OppNet application must be in the following format: 
 ```json
 {"type": 102, "data": []}
-'''
+```
 inside the array defined by field "data", each element is formatted as: {"path": a unique device id, "data": data content, "delay": 0, "id": data packet id}, then the application is able to correctly parse the packet the sensor sends to it.
 
 
