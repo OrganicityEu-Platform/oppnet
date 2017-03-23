@@ -98,7 +98,7 @@ The application can be developed using any Android IDE, such as Eclipse and Andr
 
 ###### Install the app
 
-The app can be installed either through downloading the [.apk](https://github.com/OrganiCity-OppNet/OppNet/releases/download/0.2/OppNet.apk) or compiling on your local machine. 
+The app can be installed either through downloading the [.apk](https://github.com/OrganicityEu-Platform/oppnet/releases/download/v1.0/OppNet.apk) or compiling on your local machine. 
 
 There are five main UI:
 
