@@ -4,7 +4,7 @@
 ## Introduction
 ###### OrganiCity
 
-[OrganiCity](organicity.eu) is a new EU project with € 7.2m in funding that puts people at the centre of the development of future cities.
+[OrganiCity](organicity.eu) is an EU Horizon 2020 project that puts people at the centre of the development of future cities.
 
 ###### Opportunistic connectivity service
 
