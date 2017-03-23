@@ -17,7 +17,7 @@ The opportunistic network enabler uses smartphones and IoT devices to build a dy
 
 The application architecture is shown below:
 
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/oppnet_architecture.png" width="400">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/oppnet_architecture.png" width="250">
 
 The major components of the application include an account manager, a data manager, a device manager and a communication manager. Besides, an incentivisation scheme is also introduced here.
 
