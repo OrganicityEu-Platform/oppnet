@@ -11,7 +11,7 @@
 Opportunistic connectivity service is a tool in OrganiCity to enable co-creation of smart citizens. 
 The opportunistic network enabler uses smartphones and IoT devices to build a dynamic wireless communication "infrastructure" at an OC partner site. The software component that enables opportunistic communication will allow the smartphones of OC participants and IoT devices to become part of the networking infrastructure at OC partner sites.
 
-<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/integration.png" width="400">
+<img src="https://raw.githubusercontent.com/OrganicityEu-Platform/oppnet/master/integration.png" width="250">
 
 ## Application Architecture
 
