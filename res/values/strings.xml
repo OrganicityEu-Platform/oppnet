@@ -6,6 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="text_authroise">Please note that by authorising the OppNet application to access your account information, OppNet will obtain the permission to send data on behalf of you.</string>
     <string name="action_authorise">Authorise</string>
+    <string name="action_upload_data">Upload All Data</string>
     <string name="action_register">Register</string>
     <string name="pref_sms_storage_title">SMS Storage</string>
     <string name="nav_btn_setting">Settings</string>

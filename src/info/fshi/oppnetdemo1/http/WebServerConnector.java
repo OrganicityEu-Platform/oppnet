@@ -56,39 +56,39 @@ public class WebServerConnector extends BroadcastReceiver{
 	private final static String serverUrl = "https://exp.orion.organicity.eu/v2/entities";
 
 	private final static String EXPERIMENT_URL = "http://experimenters.organicity.eu:8081/";
-	
+
 	private static Context mContext = null;
 
 	private static long updatedTime;
 
 	private static WebServerConnector _obj = null;
-	
+
 	private WebServerConnector(Context context){
 		mContext = context;
 		updatedTime = System.currentTimeMillis();
 	}
-	
+
 	public static WebServerConnector getInstance(Context context){
 		if(_obj == null){
 			_obj = new WebServerConnector(context);
 		}
 		return _obj;
 	}
-	
+
 	public WebServerConnector(){}
 
 	public void registerDevice(){
 		new RegisterDeviceTask().execute();
 	}
-	
+
 	public void getAllExperiments(){
 		new GetAllExperimentsTask().execute();
 	}
-	
+
 	private class GetAllExperimentsTask extends AsyncTask<Void, Void, Void> {
 		protected Void doInBackground(Void... data) {
 			Log.d(TAG, "Get experiment list from the server");
-			
+
 			URL url;
 			HttpURLConnection connection = null;
 			try{
@@ -107,11 +107,11 @@ public class WebServerConnector extends BroadcastReceiver{
 				while ((inputStr = streamReader.readLine()) != null)
 					responseStrBuilder.append(inputStr);
 				JSONObject json = new JSONObject(responseStrBuilder.toString());
-				
+
 				JSONArray expArray = json.getJSONArray("experiments");
-				
+
 				ArrayList<Experiment> updatedExp = new ArrayList<Experiment>();
-				
+
 				for(int i=0; i < expArray.length(); i++){
 					Experiment exp = new Experiment();
 					JSONObject expJSON = (JSONObject) expArray.get(i);
@@ -125,7 +125,14 @@ public class WebServerConnector extends BroadcastReceiver{
 						JSONObject area = (JSONObject) areaArray.get(0);
 						JSONArray areaCoord = area.getJSONArray("coordinates");
 						for(int j=0; j<areaCoord.length(); j++){
-							exp.area.add(new LatLng(areaCoord.getJSONArray(j).getDouble(1), areaCoord.getJSONArray(j).getDouble(0)));						
+
+							if(areaCoord.getJSONArray(j).length() > 1){
+								try{
+									exp.area.add(new LatLng(areaCoord.getJSONArray(j).getDouble(1), areaCoord.getJSONArray(j).getDouble(0)));
+								}catch(JSONException e){
+									e.printStackTrace();
+								}
+							}
 						}
 					}
 					if(ExperimentList.joinedExp != null){
@@ -166,14 +173,14 @@ public class WebServerConnector extends BroadcastReceiver{
 	}
 
 	private static boolean serverAvailable = true;
-	
+
 	private class SendSensorDataTask extends AsyncTask<String, Void, Void> {
 		protected Void doInBackground(String... data) {
 
 			String entityId = ENTITY_URI + Constants.EXPERIMENTER_ID + ":" + Constants.EXPERIMENT_ID + ":" + AccountManager.getManager().getParsedInfo().getSubject() + ":" + data[2];
 
 			Log.d(TAG, "send data to server");
-			
+
 			JSONObject content = new JSONObject();
 			try {
 				// experiment id
@@ -186,12 +193,13 @@ public class WebServerConnector extends BroadcastReceiver{
 				dataAttr.put("value", data[1]);
 				content.put("illuminance", dataAttr);
 				JSONObject pathAttr = new JSONObject();
-				pathAttr.put("type", "urn:oc:attributeType:description");
+				pathAttr.put("type", "urn:oc:attributeType:oppnet:path");
 				pathAttr.put("value", data[0]);
-				content.put("description", pathAttr);
+				content.put("path", pathAttr);
 				JSONObject delayAttr = new JSONObject();
+				delayAttr.put("type", "urn:oc:attributeType:oppnet:delay");
 				delayAttr.put("value", data[3]);
-				content.put("duration", delayAttr);
+				content.put("delay", delayAttr);
 				// data
 				JSONObject timeInstant = new JSONObject();
 				timeInstant.put("type", "urn:oc:attributeType:ISO8601");
@@ -210,7 +218,7 @@ public class WebServerConnector extends BroadcastReceiver{
 			HttpsURLConnection connection = null;
 			try{
 				Log.d(TAG, serverUrl + entityId);
-				
+
 				url = new URL(serverUrl);
 				connection = (HttpsURLConnection)url.openConnection();
 				connection.setSSLSocketFactory(trainCA().getSocketFactory());
@@ -230,7 +238,7 @@ public class WebServerConnector extends BroadcastReceiver{
 				Log.d(TAG, String.valueOf(connection.getResponseCode()));
 				Log.d(TAG, connection.getResponseMessage());
 				Log.d(TAG, connection.getCipherSuite());
-				
+
 				InputStream in = new BufferedInputStream(connection.getInputStream());
 				BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8")); 
 				StringBuilder responseStrBuilder = new StringBuilder();
@@ -259,13 +267,13 @@ public class WebServerConnector extends BroadcastReceiver{
 
 			String entityId = ENTITY_URI + Constants.EXPERIMENTER_ID + ":" + Constants.EXPERIMENT_ID + ":" + AccountManager.getManager().getParsedInfo().getSubject() + ":" + Secure.getString(mContext.getContentResolver(),
 					Secure.ANDROID_ID); // unique identifier of the device
-			
+
 			Log.d(TAG, entityId);
-			
+
 			URL url;
 			HttpsURLConnection connection = null;
 			// register to orion
-			
+
 			JSONObject content = new JSONObject();
 			try {
 				content.put("id", entityId);
@@ -282,9 +290,9 @@ public class WebServerConnector extends BroadcastReceiver{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
+
 			Log.d(TAG, String.format("Bearer %s", AccountManager.getManager().getToken()));
-			
+
 			try{
 				url = new URL(serverUrl);
 				connection = (HttpsURLConnection)url.openConnection();
@@ -305,7 +313,7 @@ public class WebServerConnector extends BroadcastReceiver{
 				Log.d(TAG, String.valueOf(connection.getResponseCode()));
 				Log.d(TAG, connection.getResponseMessage());
 				Log.d(TAG, connection.getCipherSuite());
-				
+
 				InputStream in = new BufferedInputStream(connection.getInputStream());
 				BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8")); 
 				StringBuilder responseStrBuilder = new StringBuilder();
@@ -335,10 +343,10 @@ public class WebServerConnector extends BroadcastReceiver{
 		if (mWifi.isConnected()) {
 			// Do whatever
 			Log.d(TAG, "wifi connected");
-//			DataManager.getInstance(mContext).saveLog("wifi connected");
-			
+			//			DataManager.getInstance(mContext).saveLog("wifi connected");
+
 			serverAvailable = true;
-			
+
 			// send data to sink
 			long currentTime = System.currentTimeMillis();
 
@@ -349,7 +357,7 @@ public class WebServerConnector extends BroadcastReceiver{
 			}
 		}
 	}
-	
+
 	public void uploadSensorData(long currentTime){
 		while(QueueManager.getInstance(mContext).getQueueLength() > 0 & serverAvailable){
 			String[] data = QueueManager.getInstance(mContext).getFromQueue();
@@ -358,10 +366,10 @@ public class WebServerConnector extends BroadcastReceiver{
 		QueueManager.getInstance(mContext).updateName();
 		Log.d(TAG, "update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
 		new GetAllExperimentsTask().execute();
-//		MainActivity.txMyQueueLen.setText(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
+		//		MainActivity.txMyQueueLen.setText(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
 		updatedTime = currentTime;
 	}
-	
+
 	private SSLContext trainCA(){
 		// Load CAs from an InputStream
 		// (could be from a resource or ByteArrayInputStream or ...)
@@ -372,20 +380,20 @@ public class WebServerConnector extends BroadcastReceiver{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		InputStream caInput = Thread.currentThread().getContextClassLoader().getResourceAsStream("isrgrootx1.pem");
 
 		if(caInput == null)
 			caInput = this.getClass().getResourceAsStream("lets-encrypt-x3-cross-signed.pem");
 		Certificate ca = null;
 		try {
-		    ca = cf.generateCertificate(caInput);
-		    Log.d("test", "ca=" + ((X509Certificate) ca).getSubjectDN());
+			ca = cf.generateCertificate(caInput);
+			Log.d("test", "ca=" + ((X509Certificate) ca).getSubjectDN());
 		} catch (CertificateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-		    try {
+			try {
 				caInput.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -426,7 +434,7 @@ public class WebServerConnector extends BroadcastReceiver{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return context;
 	}
 }

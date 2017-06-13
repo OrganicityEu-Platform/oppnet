@@ -232,5 +232,15 @@
             android:textStyle="bold" >
         </TextView>
     </LinearLayout>
+    
+    <Button
+        android:id="@+id/btn_send_data"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/organicity"
+        android:text="@string/action_upload_data"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
 </LinearLayout>
